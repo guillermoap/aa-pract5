@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from copy import deepcopy
 from src.math import mean
 from sklearn.metrics.pairwise import euclidean_distances
 
@@ -10,7 +11,7 @@ class KMeans:
             vector = [random.randrange(1, 6, 1) for _ in range(26)] # los valores de las respuestas ∈ {1..5}
         return np.array(vector)
 
-    def __init__(self, data, cluster_count=5, dimension=26, epsilon=0.001):
+    def __init__(self, data, cluster_count=2, dimension=26, epsilon=0.001):
         self.data = data
         self.data_cluster_idx = [0 for idx in range(len(data))]
         self.centroids = [self.centroid() for _ in range(cluster_count)]
@@ -47,13 +48,8 @@ class KMeans:
     def train(self, K=10):
         runs = 0
         while True:
+            last_clusters = deepcopy(self.clusters)
             self._train()
-            if self.cost_function < self.epsilon or runs == K:
-                print('##### COST FUNCTION #####')
-                print(self.cost_function)
-                print('##### RUNS #####')
-                print(runs)
+            if last_clusters == self.clusters:
                 break
             runs += 1
-        return self.clusters, self.centroids, self.data_cluster_idx
-
